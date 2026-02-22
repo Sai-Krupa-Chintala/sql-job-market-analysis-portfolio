@@ -125,7 +125,7 @@ ORDER BY
 LIMIT 10;
 ```
 
-![Top Paying Jobs](assets/q1_top_paying_jobs.png)
+![Top Paying Jobs](sql-job-market-analysis-portfolio/q1_top_paying_jobs.png)
 
 ---
 
