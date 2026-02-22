@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Market Analysis | SQL Project</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d0d12;
+  --paper: #f5f4ef;
+  --warm: #f0ede4;
+  --card-bg: #ffffff;
+  --border: #e2dfd6;
+  --accent: #c84b31;
+  --accent2: #2a6496;
+  --accent3: #27864a;
+  --gold: #d4a017;
+  --muted: #8a8578;
+  --text: #1a1915;
+  --shadow: 0 2px 20px rgba(0,0,0,0.07);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(245,244,239,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+}
+.nav-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.nav-links {
+  display: flex; gap: 0.25rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+.nav-links a:hover { background: var(--border); color: var(--text); }
+
+/* ── HERO ── */
+.hero {
+  padding: 120px 2rem 70px;
+  max-width: 1000px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  animation: fadeUp 0.8s ease both;
+}
+.hero-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.hero-label::before {
+  content: ''; width: 24px; height: 1px; background: var(--accent);
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+}
+.hero-desc {
+  margin-top: 1.5rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  max-width: 380px;
+}
+.hero-stats {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.hero-stat {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex; align-items: center; gap: 1.25rem;
+  box-shadow: var(--shadow);
+}
+.hero-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.5rem;
+  color: var(--accent);
+  line-height: 1;
+  min-width: 60px;
+}
+.hero-stat-info { display: flex; flex-direction: column; }
+.hero-stat-label { font-weight: 600; font-size: 0.9rem; }
+.hero-stat-sub { font-size: 0.78rem; color: var(--muted); }
+
+/* ── SECTION WRAPPER ── */
+.section {
+  max-width: 1000px; margin: 0 auto;
+  padding: 5rem 2rem;
+  border-top: 1px solid var(--border);
+}
+.section-header {
+  display: flex; align-items: flex-start; gap: 2rem;
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 5rem;
+  color: var(--border);
+  line-height: 1;
+  flex-shrink: 0;
+  user-select: none;
+}
+.section-meta { flex: 1; }
+.section-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  line-height: 1.05;
+}
+.section-desc {
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  max-width: 520px;
+}
+
+/* ── SQL CHIP ── */
+.sql-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--ink);
+  color: #7ec8a4;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+.sql-chip span { color: #c084fc; }
+
+/* ── SQL QUERY BLOCK ── */
+.query-toggle {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: none; border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.5rem 1rem;
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  color: var(--muted); cursor: pointer;
+  margin-bottom: 1rem; transition: all 0.2s;
+  width: fit-content;
+}
+.query-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.query-toggle .arrow { transition: transform 0.25s; display: inline-block; }
+.query-toggle.open .arrow { transform: rotate(90deg); }
+.query-block {
+  display: none; margin-bottom: 1.5rem;
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.query-block.open { display: block; }
+.query-block-header {
+  background: #0d1117; padding: 0.6rem 1rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.query-block-label {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #4b5563;
+}
+.copy-btn {
+  background: none; border: 1px solid #333; border-radius: 4px;
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  color: #6b7280; padding: 0.2rem 0.6rem; cursor: pointer;
+  transition: all 0.2s; letter-spacing: 0.05em;
+}
+.copy-btn:hover { border-color: #7ec8a4; color: #7ec8a4; }
+.copy-btn.copied { border-color: #7ec8a4; color: #7ec8a4; }
+.query-block pre {
+  background: #0d1117; margin: 0; padding: 1.25rem 1.5rem;
+  overflow-x: auto; font-family: 'DM Mono', monospace;
+  font-size: 0.78rem; line-height: 1.8; color: #e2e8f0;
+}
+.sql-kw  { color: #c084fc; font-weight: 500; }
+.sql-fn  { color: #60a5fa; }
+.sql-str { color: #fbbf24; }
+.sql-tbl { color: #7ec8a4; }
+.sql-num { color: #f97316; }
+
+/* ── Q1: JOB CARDS ── */
+.job-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.job-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow);
+}
+.job-card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+.jc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+.jc-id { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--muted); }
+.jc-badge {
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.15rem 0.5rem; border-radius: 4px;
+}
+.badge-da { background: #eef9f3; color: #27864a; border: 1px solid #b8e8cc; }
+.badge-de { background: #eef4fb; color: #2a6496; border: 1px solid #b8d4ed; }
+.badge-ce { background: #fdf3f0; color: #c84b31; border: 1px solid #f5c4b8; }
+.jc-title { font-weight: 600; font-size: 0.92rem; margin-bottom: 0.75rem; line-height: 1.3; }
+.jc-row { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.3rem; }
+.jc-row strong { color: var(--text); font-weight: 500; }
+.jc-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+.jc-tag {
+  font-size: 0.62rem; padding: 0.15rem 0.45rem; border-radius: 4px;
+  border: 1px solid var(--border); color: var(--muted);
+}
+.tag-remote { border-color: #27864a; color: #27864a; background: #f0faf4; }
+.tag-salary { border-color: var(--gold); color: var(--gold); background: #fdf9eb; }
+
+/* ── Q2: SALARY + SKILLS TABLE ── */
+.company-blocks { display: flex; flex-direction: column; gap: 1px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.company-row {
+  background: var(--card-bg);
+  display: grid; grid-template-columns: 180px 1fr auto;
+  align-items: center; gap: 1.5rem;
+  padding: 1rem 1.25rem;
+  transition: background 0.15s;
+}
+.company-row:hover { background: var(--warm); }
+.co-name { font-weight: 600; font-size: 0.88rem; }
+.co-salary {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.co-skills { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.skill-pill {
+  font-size: 0.62rem; font-weight: 500;
+  padding: 0.2rem 0.5rem; border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: var(--warm);
+  letter-spacing: 0.03em;
+}
+.skill-pill.core { border-color: var(--accent2); color: var(--accent2); background: #eef4fb; }
+.skill-pill.viz  { border-color: #9333ea; color: #9333ea; background: #f5f0fd; }
+.skill-pill.cloud{ border-color: #d97706; color: #d97706; background: #fef8ec; }
+
+/* ── Q3: DEMAND BAR CHART ── */
+.demand-chart { display: flex; flex-direction: column; gap: 0.75rem; }
+.demand-row { display: grid; grid-template-columns: 90px 1fr 80px; align-items: center; gap: 1rem; }
+.demand-label { font-weight: 600; font-size: 0.88rem; text-align: right; }
+.demand-bar-wrap {
+  background: var(--border); border-radius: 999px; height: 28px; overflow: hidden;
+}
+.demand-bar {
+  height: 100%; border-radius: 999px;
+  display: flex; align-items: center; padding-left: 0.75rem;
+  font-family: 'DM Mono', monospace; font-size: 0.68rem; color: white; font-weight: 500;
+  transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+.demand-count { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+.bar-sql    { background: linear-gradient(90deg, #c84b31, #e06b50); }
+.bar-excel  { background: linear-gradient(90deg, #27864a, #3aad63); }
+.bar-python { background: linear-gradient(90deg, #2a6496, #3d87c9); }
+.bar-tableau{ background: linear-gradient(90deg, #9333ea, #b05cf5); }
+.bar-powerbi{ background: linear-gradient(90deg, #d4a017, #e8b82a); }
+
+.insight-box {
+  margin-top: 2rem;
+  background: var(--ink); color: var(--paper);
+  border-radius: 12px; padding: 1.5rem 2rem;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+}
+.insight-item { text-align: center; }
+.insight-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem; color: var(--accent); line-height: 1;
+}
+.insight-label { font-size: 0.75rem; color: #aaa7a0; margin-top: 0.25rem; }
+
+/* ── Q4: TOP PAYING SKILLS ── */
+.skills-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem;
+}
+.skill-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 1rem;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow);
+}
+.skill-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.09); }
+.skill-card-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+}
+.skill-card-salary {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.7rem; line-height: 1;
+}
+.skill-card-bar {
+  margin-top: 0.6rem; height: 3px; border-radius: 2px;
+  background: var(--border);
+}
+.skill-card-fill { height: 100%; border-radius: 2px; }
+.tier-1 .skill-card-salary { color: #c84b31; }
+.tier-1 .skill-card-fill { background: #c84b31; }
+.tier-2 .skill-card-salary { color: #d97706; }
+.tier-2 .skill-card-fill { background: #d97706; }
+.tier-3 .skill-card-salary { color: #2a6496; }
+.tier-3 .skill-card-fill { background: #2a6496; }
+.tier-crown {
+  position: absolute; top: 0.5rem; right: 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* ── Q5: OPTIMAL SKILLS SCATTER ── */
+.scatter-wrap {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.scatter-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.scatter-legend { display: flex; gap: 1rem; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.73rem; color: var(--muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+#scatterCanvas { display: block; width: 100%; }
+
+.optimal-table {
+  width: 100%; border-collapse: collapse; margin-top: 2rem;
+}
+.optimal-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--muted); padding: 0.6rem 1rem;
+  background: var(--warm); border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.optimal-table td {
+  padding: 0.7rem 1rem; border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.optimal-table tr:last-child td { border-bottom: none; }
+.optimal-table tr:hover td { background: var(--warm); }
+.rank-num {
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--muted);
+}
+.score-bar-wrap { background: var(--border); border-radius: 4px; height: 6px; width: 100%; }
+.score-bar-fill { height: 100%; border-radius: 4px; background: var(--accent2); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink); color: var(--paper);
+  text-align: center; padding: 3rem 2rem;
+  margin-top: 4rem;
+}
+.footer-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; letter-spacing: 0.06em; margin-bottom: 0.5rem;
+  color: var(--accent);
+}
+.footer-sub { font-size: 0.82rem; color: #aaa7a0; }
+.footer-tags { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.footer-tag {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  padding: 0.3rem 0.7rem; border-radius: 4px;
+  border: 1px solid #333; color: #888;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 700px) {
+  .hero { grid-template-columns: 1fr; gap: 2rem; padding-top: 90px; }
+  .section-header { flex-direction: column; gap: 0.5rem; }
+  .section-num { font-size: 3rem; }
+  .company-row { grid-template-columns: 1fr; gap: 0.5rem; }
+  .insight-box { grid-template-columns: 1fr; }
+  .demand-row { grid-template-columns: 70px 1fr 60px; }
+  nav .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">SQL Project: Job Market Analysis</div>
+  <ul class="nav-links">
+    <li><a href="#q1">Q1 Jobs</a></li>
+    <li><a href="#q2">Q2 Skills</a></li>
+    <li><a href="#q3">Q3 Demand</a></li>
+    <li><a href="#q4">Q4 Salary</a></li>
+    <li><a href="#q5">Q5 Optimal</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-label">SQL PROJECT</div>
+    <h1><em>Job<br>Market</em><br>Analysis</h1>
+    <p class="hero-desc">A data-driven exploration of the 2023 job market, uncovering where the highest salaries live, which skills employers actually want, and what an aspiring data analyst should learn first to maximize both opportunity and earning potential.</p>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">10</div>
+      <div class="hero-stat-info">
+        <span class="hero-stat-label">Top Companies Analyzed</span>
+        <span class="hero-stat-sub">Meta, AT&T, Pinterest & more</span>
+      </div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">$650K</div>
+      <div class="hero-stat-info">
+        <span class="hero-stat-label">Top Salary Found</span>
+        <span class="hero-stat-sub">highest-paying remote DA role</span>
+      </div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">92K</div>
+      <div class="hero-stat-info">
+        <span class="hero-stat-label">SQL Job Postings</span>
+        <span class="hero-stat-sub">#1 most demanded skill</span>
+      </div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">$400K</div>
+      <div class="hero-stat-info">
+        <span class="hero-stat-label">Top Skill Avg Salary</span>
+        <span class="hero-stat-sub">SVN, niche but lucrative</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT DESCRIPTION -->
+<div style="max-width:1000px;margin:0 auto;padding:0 2rem 4rem;border-top:1px solid var(--border)">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;padding-top:3rem">
+    <div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem">Project Description</div>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.03em;color:var(--ink);margin-bottom:1rem;line-height:1.1">SQL Project: Job Market Analysis</h2>
+      <p style="color:var(--muted);font-size:0.9rem;line-height:1.75">This project is an end-to-end SQL analysis of the data analyst job market, designed to answer one core question: what skills should an aspiring data analyst prioritize to maximize both employability and earning potential? Using a real-world dataset of job postings, I wrote five structured SQL queries, progressing from basic selects to multi-CTE joins, to systematically uncover what top-paying companies want, which skills dominate job listings, and where the sweet spot between demand and salary lies. The project demonstrates practical SQL fluency across filtering, aggregation, window functions, CTEs, and multi-table joins.</p>
+    </div>
+    <div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem">Tools Used</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2rem">
+        <span style="background:var(--ink);color:#7ec8a4;font-family:'DM Mono',monospace;font-size:0.72rem;padding:0.35rem 0.8rem;border-radius:6px">PostgreSQL</span>
+        <span style="background:var(--ink);color:#c084fc;font-family:'DM Mono',monospace;font-size:0.72rem;padding:0.35rem 0.8rem;border-radius:6px">SQL</span>
+        <span style="background:var(--ink);color:#60a5fa;font-family:'DM Mono',monospace;font-size:0.72rem;padding:0.35rem 0.8rem;border-radius:6px">Visual Studio Code</span>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem">Skills Demonstrated</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem">
+        <span style="border:1px solid var(--border);border-radius:4px;font-size:0.72rem;padding:0.25rem 0.6rem;color:var(--muted)">Filtering</span>
+        <span style="border:1px solid var(--border);border-radius:4px;font-size:0.72rem;padding:0.25rem 0.6rem;color:var(--muted)">Aggregation</span>
+        <span style="border:1px solid var(--border);border-radius:4px;font-size:0.72rem;padding:0.25rem 0.6rem;color:var(--muted)">Window Functions</span>
+        <span style="border:1px solid var(--border);border-radius:4px;font-size:0.72rem;padding:0.25rem 0.6rem;color:var(--muted)">CTEs</span>
+        <span style="border:1px solid var(--border);border-radius:4px;font-size:0.72rem;padding:0.25rem 0.6rem;color:var(--muted)">Multi-table Joins</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Q1: TOP PAYING JOBS -->
+<section class="section fade-in" id="q1">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-meta">
+      <div class="section-tag">Query One</div>
+      <div class="section-title">Top Paying<br>Data Analyst Jobs</div>
+      <p class="section-desc">Top 10 highest-paying Data Analyst roles available remotely with specified salaries, filtered for work-from-home positions only.</p>
+    </div>
+  </div>
+  <div style="background:var(--warm);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:2rem">
+    <div style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem">Query Insight</div>
+    <p style="font-size:0.88rem;color:var(--text);line-height:1.7">The salary spread is massive. The range runs from $185K to $650K, a $465K gap within the same job title, which tells you compensation is heavily driven by company type and industry, not just the role itself. Mantys ($650K) and Meta ($336K) sit far above the rest as clear outliers. Strip those two out and the realistic top-tier ceiling is around $185K to $255K, which is still exceptional. Tech and finance dominate the list with AT&T, Meta, Pinterest, SmartAsset, and Patterned Learning AI making up most of it. Every single role here is remote and full-time, reinforcing that the highest-paying opportunities have fully embraced remote work. Roles appeared throughout 2023 with no strong seasonal cluster, meaning the top-paying market stays relatively active year-round.</p>
+  </div>
+  <button class="query-toggle" onclick="toggleQuery('q1-code',this)"><span class="arrow">▶</span> View SQL Query</button>
+  <div class="query-block" id="q1-code">
+    <div class="query-block-header">
+      <span class="query-block-label">query_1.sql</span>
+      <button class="copy-btn" onclick="copyQuery('q1-raw',this)">copy</button>
+    </div>
+    <pre id="q1-raw"><span class="sql-kw">SELECT</span>
+    job_id,
+    job_title_short  <span class="sql-kw">AS</span> job_title,
+    company.name     <span class="sql-kw">AS</span> company_name,
+    job_location,
+    job_schedule_type,
+    job_posted_date,
+    <span class="sql-fn">ROUND</span>(salary_year_avg, <span class="sql-num">0</span>) <span class="sql-kw">AS</span> salary,
+    <span class="sql-kw">CASE</span>
+        <span class="sql-kw">WHEN</span> job_work_from_home = <span class="sql-kw">TRUE</span> <span class="sql-kw">THEN</span> <span class="sql-str">'remote'</span>
+        <span class="sql-kw">ELSE</span> <span class="sql-str">'on_site'</span>
+    <span class="sql-kw">END AS</span> job_type
+<span class="sql-kw">FROM</span>
+    <span class="sql-tbl">job_postings_fact</span> <span class="sql-kw">AS</span> job_postings
+<span class="sql-kw">LEFT JOIN</span>
+    <span class="sql-tbl">company_dim</span> <span class="sql-kw">AS</span> company
+    <span class="sql-kw">ON</span> job_postings.company_id = company.company_id
+<span class="sql-kw">WHERE</span>
+    job_title_short <span class="sql-kw">LIKE</span> <span class="sql-str">'%Data Analyst%'</span>
+    <span class="sql-kw">AND</span> job_work_from_home = <span class="sql-kw">TRUE</span>
+    <span class="sql-kw">AND</span> salary_year_avg <span class="sql-kw">IS NOT NULL</span>
+<span class="sql-kw">ORDER BY</span>
+    salary <span class="sql-kw">DESC</span>
+<span class="sql-kw">LIMIT</span> <span class="sql-num">10</span>;</pre>
+  </div>
+  <div class="job-cards" id="jobCardsContainer"></div>
+</section>
+
+<!-- Q2: SKILLS FOR TOP JOBS -->
+<section class="section fade-in" id="q2">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-meta">
+      <div class="section-tag">Query Two</div>
+      <div class="section-title">Skills Behind<br>Top Paying Jobs</div>
+      <p class="section-desc">Skills required by the highest-paying data analyst positions, showing what elite companies actually expect in 2023.</p>
+    </div>
+  </div>
+  <div style="background:var(--warm);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:2rem">
+    <div style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem">Query Insight</div>
+    <p style="font-size:0.88rem;color:var(--text);line-height:1.7">The $180K to $255K salary tier consistently requires a combination of SQL, Python, and Tableau as the foundation, with cloud skills like AWS, Azure, and Databricks separating the highest earners. AT&T's $255K role required 13 skills, including PySpark and Pandas, suggesting that the top of the market rewards analysts who can operate across the full data engineering stack, not just analysis.</p>
+  </div>
+  <button class="query-toggle" onclick="toggleQuery('q2-code',this)"><span class="arrow">▶</span> View SQL Query</button>
+  <div class="query-block" id="q2-code">
+    <div class="query-block-header">
+      <span class="query-block-label">query_2.sql</span>
+      <button class="copy-btn" onclick="copyQuery('q2-raw',this)">copy</button>
+    </div>
+    <pre id="q2-raw"><span class="sql-kw">WITH</span> <span class="sql-tbl">top_paying_jobs</span> <span class="sql-kw">AS</span> (
+    <span class="sql-kw">SELECT</span>
+        job_id,
+        job_title_short  <span class="sql-kw">AS</span> job_title,
+        salary_year_avg  <span class="sql-kw">AS</span> salary,
+        job_location,
+        job_posted_date,
+        company.name     <span class="sql-kw">AS</span> company_name
+    <span class="sql-kw">FROM</span> <span class="sql-tbl">job_postings_fact</span>
+    <span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">company_dim</span> <span class="sql-kw">AS</span> company
+        <span class="sql-kw">ON</span> job_postings_fact.company_id = company.company_id
+    <span class="sql-kw">WHERE</span>
+        job_work_from_home = <span class="sql-kw">TRUE</span>
+        <span class="sql-kw">AND</span> job_title_short = <span class="sql-str">'Data Analyst'</span>
+        <span class="sql-kw">AND</span> salary_year_avg <span class="sql-kw">IS NOT NULL</span>
+    <span class="sql-kw">ORDER BY</span> salary_year_avg <span class="sql-kw">DESC</span>
+    <span class="sql-kw">LIMIT</span> <span class="sql-num">10</span>
+)
+<span class="sql-kw">SELECT</span>
+    tpj.*,
+    s_skill.skills <span class="sql-kw">AS</span> skill_name
+<span class="sql-kw">FROM</span> <span class="sql-tbl">top_paying_jobs</span> <span class="sql-kw">AS</span> tpj
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">skills_job_dim</span> <span class="sql-kw">AS</span> j_skill
+    <span class="sql-kw">ON</span> tpj.job_id = j_skill.job_id
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">skills_dim</span> <span class="sql-kw">AS</span> s_skill
+    <span class="sql-kw">ON</span> j_skill.skill_id = s_skill.skill_id
+<span class="sql-kw">ORDER BY</span> tpj.salary <span class="sql-kw">DESC</span>, s_skill.skills;</pre>
+  </div>
+  <div class="company-blocks" id="companyBlocksContainer"></div>
+</section>
+
+<!-- Q3: IN-DEMAND SKILLS -->
+<section class="section fade-in" id="q3">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-meta">
+      <div class="section-tag">Query Three</div>
+      <div class="section-title">Most In-Demand<br>Skills for Data Analysts</div>
+      <p class="section-desc">Top 5 skills by raw job posting count, what every hiring manager expects you to know.</p>
+    </div>
+  </div>
+  <div style="background:var(--warm);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:2rem">
+    <div style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem">Query Insight</div>
+    <p style="font-size:0.88rem;color:var(--text);line-height:1.7">SQL dominates with 92,628 job postings, nearly 40% more than the second most demanded skill, Excel (67,031). The top 5 in order are SQL, Excel, Python, Tableau, and Power BI. This confirms the classic analyst stack and highlights that foundational skills still drive the volume of hiring, even if niche skills command higher salaries.</p>
+  </div>
+  <button class="query-toggle" onclick="toggleQuery('q3-code',this)"><span class="arrow">▶</span> View SQL Query</button>
+  <div class="query-block" id="q3-code">
+    <div class="query-block-header">
+      <span class="query-block-label">query_3.sql</span>
+      <button class="copy-btn" onclick="copyQuery('q3-raw',this)">copy</button>
+    </div>
+    <pre id="q3-raw"><span class="sql-kw">WITH</span> <span class="sql-tbl">skill_demand</span> <span class="sql-kw">AS</span> (
+    <span class="sql-kw">SELECT</span>
+        sj.skill_id,
+        j.job_title_short,
+        <span class="sql-fn">COUNT</span>(*) <span class="sql-kw">AS</span> total_skill_count
+    <span class="sql-kw">FROM</span> <span class="sql-tbl">job_postings_fact</span> <span class="sql-kw">AS</span> j
+    <span class="sql-kw">INNER JOIN</span>
+        <span class="sql-tbl">skills_job_dim</span> <span class="sql-kw">AS</span> sj
+        <span class="sql-kw">ON</span> j.job_id = sj.job_id
+    <span class="sql-kw">WHERE</span>
+        j.job_title_short <span class="sql-kw">ILIKE</span> <span class="sql-str">'Data Analyst'</span>
+    <span class="sql-kw">GROUP BY</span>
+        sj.skill_id,
+        j.job_title_short
+)
+<span class="sql-kw">SELECT</span>
+    sd.job_title_short,
+    s.skills <span class="sql-kw">AS</span> skill_name,
+    sd.total_skill_count
+<span class="sql-kw">FROM</span>
+    <span class="sql-tbl">skill_demand</span> <span class="sql-kw">AS</span> sd
+<span class="sql-kw">INNER JOIN</span>
+    <span class="sql-tbl">skills_dim</span> <span class="sql-kw">AS</span> s
+    <span class="sql-kw">ON</span> sd.skill_id = s.skill_id
+<span class="sql-kw">ORDER BY</span>
+    total_skill_count <span class="sql-kw">DESC</span>
+<span class="sql-kw">LIMIT</span> <span class="sql-num">5</span>;</pre>
+  </div>
+  <div class="demand-chart" id="demandChartContainer"></div>
+  <div class="insight-box">
+    <div class="insight-item">
+      <div class="insight-num">92,628</div>
+      <div class="insight-label">SQL job postings — #1 skill</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-num">2.3×</div>
+      <div class="insight-label">SQL demand vs Power BI</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-num">343K</div>
+      <div class="insight-label">Total top-5 skill postings</div>
+    </div>
+  </div>
+</section>
+
+<!-- Q4: TOP PAYING SKILLS -->
+<section class="section fade-in" id="q4">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-meta">
+      <div class="section-tag">Query Four</div>
+      <div class="section-title">Top Paying Skills<br>by Average Salary</div>
+      <p class="section-desc">Skills associated with the highest average salaries. Niche tools command massive premiums even with lower demand.</p>
+    </div>
+  </div>
+  <div style="background:var(--warm);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:2rem">
+    <div style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem">Query Insight</div>
+    <p style="font-size:0.88rem;color:var(--text);line-height:1.7">When sorted purely by average salary, niche and specialized skills like SVN ($400K), Solidity ($179K), and Couchbase ($160K) top the list, but these are driven by very few job postings and should be treated cautiously. The more actionable insight is in the $110K to $135K band: Kafka, Spark, Airflow, Snowflake, and Databricks represent cloud and big data skills with meaningful job volume and strong pay.</p>
+  </div>
+  <button class="query-toggle" onclick="toggleQuery('q4-code',this)"><span class="arrow">▶</span> View SQL Query</button>
+  <div class="query-block" id="q4-code">
+    <div class="query-block-header">
+      <span class="query-block-label">query_4.sql</span>
+      <button class="copy-btn" onclick="copyQuery('q4-raw',this)">copy</button>
+    </div>
+    <pre id="q4-raw"><span class="sql-kw">WITH</span> <span class="sql-tbl">skills_in_demand</span> <span class="sql-kw">AS</span> (
+    <span class="sql-kw">SELECT</span>
+        j.job_title_short  <span class="sql-kw">AS</span> job_title,
+        sj.skill_id,
+        <span class="sql-fn">ROUND</span>(<span class="sql-fn">AVG</span>(j.salary_year_avg), <span class="sql-num">0</span>) <span class="sql-kw">AS</span> avg_salary,
+        <span class="sql-fn">COUNT</span>(*) <span class="sql-kw">AS</span> total_skill_count
+    <span class="sql-kw">FROM</span>
+        <span class="sql-tbl">job_postings_fact</span> <span class="sql-kw">AS</span> j
+    <span class="sql-kw">INNER JOIN</span>
+        <span class="sql-tbl">skills_job_dim</span> <span class="sql-kw">AS</span> sj
+        <span class="sql-kw">ON</span> j.job_id = sj.job_id
+    <span class="sql-kw">WHERE</span>
+        j.job_title_short <span class="sql-kw">ILIKE</span> <span class="sql-str">'Data Analyst'</span>
+        <span class="sql-kw">AND</span> j.salary_year_avg <span class="sql-kw">IS NOT NULL</span>
+    <span class="sql-kw">GROUP BY</span>
+        j.job_title_short,
+        sj.skill_id
+)
+<span class="sql-kw">SELECT</span>
+    sd.job_title,
+    s.skills <span class="sql-kw">AS</span> most_in_demand_skills,
+    sd.avg_salary
+<span class="sql-kw">FROM</span>
+    <span class="sql-tbl">skills_in_demand</span> <span class="sql-kw">AS</span> sd
+<span class="sql-kw">INNER JOIN</span>
+    <span class="sql-tbl">skills_dim</span> <span class="sql-kw">AS</span> s
+    <span class="sql-kw">ON</span> sd.skill_id = s.skill_id
+<span class="sql-kw">ORDER BY</span>
+    sd.avg_salary <span class="sql-kw">DESC</span>;</pre>
+  </div>
+  <div class="skills-grid" id="salarySkillsContainer"></div>
+</section>
+
+<!-- Q5: OPTIMAL SKILLS -->
+<section class="section fade-in" id="q5">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-meta">
+      <div class="section-tag">Query Five</div>
+      <div class="section-title">Most Optimal<br>Skills to Learn</div>
+      <p class="section-desc">The sweet spot: skills scoring high on both demand AND salary. These are the highest-ROI skills to master in 2024.</p>
+    </div>
+  </div>
+  <div style="background:var(--warm);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:2rem">
+    <div style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem">Query Insight</div>
+    <p style="font-size:0.88rem;color:var(--text);line-height:1.7">Combining both dimensions reveals the true priority list. Python ($101K avg, 57K postings), Tableau ($97K, 46K postings), and Snowflake ($111K, 6K postings) offer the best balance of job availability and salary. AWS ($106K) and Azure ($105K) are strong runners-up. SQL itself pays $96K average across 92K postings, lower relative salary but unmatched job security. The insight: SQL gets you in the door, Python and cloud skills get you paid more.</p>
+  </div>
+  <button class="query-toggle" onclick="toggleQuery('q5-code',this)"><span class="arrow">▶</span> View SQL Query</button>
+  <div class="query-block" id="q5-code">
+    <div class="query-block-header">
+      <span class="query-block-label">query_5.sql</span>
+      <button class="copy-btn" onclick="copyQuery('q5-raw',this)">copy</button>
+    </div>
+    <pre id="q5-raw"><span class="sql-kw">WITH</span> <span class="sql-tbl">highest_paying_skills</span> <span class="sql-kw">AS</span> (
+    <span class="sql-kw">SELECT</span>
+        j.job_title_short  <span class="sql-kw">AS</span> job_title,
+        sj.skill_id,
+        <span class="sql-fn">ROUND</span>(<span class="sql-fn">AVG</span>(j.salary_year_avg), <span class="sql-num">0</span>) <span class="sql-kw">AS</span> avg_salary
+    <span class="sql-kw">FROM</span>
+        <span class="sql-tbl">job_postings_fact</span> <span class="sql-kw">AS</span> j
+    <span class="sql-kw">INNER JOIN</span>
+        <span class="sql-tbl">skills_job_dim</span> <span class="sql-kw">AS</span> sj <span class="sql-kw">ON</span> j.job_id = sj.job_id
+    <span class="sql-kw">WHERE</span>
+        j.job_title_short <span class="sql-kw">ILIKE</span> <span class="sql-str">'Data Analyst'</span>
+        <span class="sql-kw">AND</span> j.salary_year_avg <span class="sql-kw">IS NOT NULL</span>
+    <span class="sql-kw">GROUP BY</span>
+        j.job_title_short, sj.skill_id
+),
+<span class="sql-tbl">skill_demand</span> <span class="sql-kw">AS</span> (
+    <span class="sql-kw">SELECT</span>
+        sj.skill_id,
+        j.job_title_short,
+        <span class="sql-fn">COUNT</span>(*) <span class="sql-kw">AS</span> demand_count
+    <span class="sql-kw">FROM</span> <span class="sql-tbl">job_postings_fact</span> <span class="sql-kw">AS</span> j
+    <span class="sql-kw">INNER JOIN</span> <span class="sql-tbl">skills_job_dim</span> <span class="sql-kw">AS</span> sj <span class="sql-kw">ON</span> j.job_id = sj.job_id
+    <span class="sql-kw">WHERE</span>
+        j.job_title_short <span class="sql-kw">ILIKE</span> <span class="sql-str">'Data Analyst'</span>
+    <span class="sql-kw">GROUP BY</span>
+        sj.skill_id, j.job_title_short
+)
+<span class="sql-kw">SELECT</span>
+    sd.skill_id,
+    s.skills <span class="sql-kw">AS</span> skill_name,
+    sd.demand_count,
+    hps.avg_salary
+<span class="sql-kw">FROM</span> <span class="sql-tbl">skill_demand</span> <span class="sql-kw">AS</span> sd
+<span class="sql-kw">INNER JOIN</span> <span class="sql-tbl">highest_paying_skills</span> <span class="sql-kw">AS</span> hps
+    <span class="sql-kw">ON</span> sd.skill_id = hps.skill_id
+    <span class="sql-kw">AND</span> sd.job_title_short = hps.job_title
+<span class="sql-kw">INNER JOIN</span> <span class="sql-tbl">skills_dim</span> <span class="sql-kw">AS</span> s
+    <span class="sql-kw">ON</span> sd.skill_id = s.skill_id
+<span class="sql-kw">ORDER BY</span>
+    sd.demand_count <span class="sql-kw">DESC</span>,
+    hps.avg_salary <span class="sql-kw">DESC</span>;</pre>
+  </div>
+  <div class="scatter-wrap">
+    <div class="scatter-header">
+      <span style="font-weight:600;font-size:0.88rem;">Demand vs. Salary Positioning</span>
+      <div class="scatter-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#c84b31"></div>High Salary</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2a6496"></div>High Demand</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#27864a"></div>Optimal Zone</div>
+      </div>
+    </div>
+    <canvas id="scatterCanvas" height="380"></canvas>
+  </div>
+  <table class="optimal-table" style="margin-top:2rem">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Skill</th>
+        <th>Demand Count</th>
+        <th>Avg Salary</th>
+        <th>Optimality Score</th>
+      </tr>
+    </thead>
+    <tbody id="optimalTableBody"></tbody>
+  </table>
+</section>
+
+<footer>
+  <div class="footer-title">Job Market Analysis</div>
+  <div class="footer-sub">SQL Job Market Analysis · Job Posting Dataset</div>
+  <div class="footer-tags">
+    <span class="footer-tag">SQL</span>
+    <span class="footer-tag">Data Analysis</span>
+    <span class="footer-tag">PostgreSQL</span>
+    <span class="footer-tag">Window Functions</span>
+    <span class="footer-tag">CTEs</span>
+    <span class="footer-tag">Aggregations</span>
+  </div>
+</footer>
+
+<script>
+/* ── DATA ── */
+const q1Jobs = [
+  {job_id:226942,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"Mantys",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-02-20",salary:650000},
+  {job_id:547382,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"Meta",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-08-23",salary:336500},
+  {job_id:552322,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"AT&T",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-06-18",salary:255830},
+  {job_id:99305,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"Pinterest Job Advertisements",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-12-05",salary:232423},
+  {job_id:1021647,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"Uclahealthcareers",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-01-17",salary:217000},
+  {job_id:168310,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"SmartAsset",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-08-09",salary:205000},
+  {job_id:731368,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"Inclusively",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-12-07",salary:189309},
+  {job_id:310660,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"Motional",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-01-05",salary:189000},
+  {job_id:1749593,job_title_short:"Data Analyst",job_title:"Data Analyst",company:"SmartAsset",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-07-11",salary:186000},
+  {job_id:1638595,job_title_short:"Senior Data Analyst",job_title:"Senior Data Analyst",company:"Patterned Learning AI",job_location:"Anywhere",job_schedule_type:"Full-time",job_work_from_home:true,job_posted_date:"2023-08-15",salary:185000}
+];
+
+const q2Companies = [
+  {name:"AT&T",salary:255829,skills:["sql","python","r","aws","azure","tableau","power bi","databricks","pandas","pyspark","excel","jupyter","powerpoint"]},
+  {name:"Pinterest Job Advertisements",salary:232423,skills:["sql","python","r","tableau","hadoop"]},
+  {name:"Uclahealthcareers",salary:217000,skills:["sql","tableau","oracle","crystal","flow"]},
+  {name:"SmartAsset",salary:205000,skills:["sql","python","tableau","snowflake","pandas","numpy","excel","gitlab","go"]},
+  {name:"Inclusively",salary:189309,skills:["sql","python","tableau","power bi","snowflake","oracle","aws","azure","jira","confluence","jenkins","atlassian","bitbucket","sap"]},
+  {name:"Motional",salary:189000,skills:["sql","python","r","git","jira","confluence","atlassian","bitbucket"]},
+  {name:"SmartAsset",salary:186000,skills:["sql","python","tableau","snowflake","pandas","numpy","excel","gitlab","go"]},
+  {name:"Get It Recruit - IT",salary:184000,skills:["sql","python","r"]}
+];
+
+const q3Skills = [
+  {skill:"SQL",count:92628,cls:"bar-sql"},
+  {skill:"Excel",count:67031,cls:"bar-excel"},
+  {skill:"Python",count:57326,cls:"bar-python"},
+  {skill:"Tableau",count:46554,cls:"bar-tableau"},
+  {skill:"Power BI",count:39468,cls:"bar-powerbi"}
+];
+
+const q4Skills = [
+  {name:"svn",salary:400000},{name:"solidity",salary:179000},{name:"couchbase",salary:160515},
+  {name:"datarobot",salary:155486},{name:"golang",salary:155000},{name:"mxnet",salary:149000},
+  {name:"dplyr",salary:147633},{name:"vmware",salary:147500},{name:"terraform",salary:146734},
+  {name:"twilio",salary:138500},{name:"gitlab",salary:134126},{name:"kafka",salary:129999},
+  {name:"puppet",salary:129820},{name:"keras",salary:127013},{name:"pytorch",salary:125226},
+  {name:"perl",salary:124686},{name:"ansible",salary:124370},{name:"hugging face",salary:123950},
+  {name:"tensorflow",salary:120647},{name:"cassandra",salary:118407},{name:"notion",salary:118092},
+  {name:"atlassian",salary:117966},{name:"bitbucket",salary:116712},{name:"airflow",salary:116387},
+  {name:"scala",salary:115480}
+];
+
+const q5Skills = [
+  {id:0,name:"sql",demand:92628,salary:96435},{id:181,name:"excel",demand:67031,salary:86419},
+  {id:1,name:"python",demand:57326,salary:101512},{id:182,name:"tableau",demand:46554,salary:97978},
+  {id:183,name:"power bi",demand:39468,salary:92324},{id:5,name:"r",demand:30075,salary:98708},
+  {id:186,name:"sas",demand:14034,salary:93707},{id:196,name:"powerpoint",demand:13848,salary:88316},
+  {id:188,name:"word",demand:13591,salary:82941},{id:189,name:"sap",demand:11297,salary:92446},
+  {id:74,name:"azure",demand:10942,salary:105400},{id:79,name:"oracle",demand:10410,salary:100964},
+  {id:76,name:"aws",demand:9063,salary:106440},{id:61,name:"sql server",demand:8304,salary:96191},
+  {id:8,name:"go",demand:7928,salary:97267},{id:185,name:"looker",demand:6271,salary:103855},
+  {id:80,name:"snowflake",demand:6194,salary:111578},{id:92,name:"spark",demand:5041,salary:113002}
+];
+
+/* ── RENDER Q1 ── */
+function badgeClass(role){
+  if(role==="Data Analyst") return "badge-da";
+  if(role==="Data Engineer") return "badge-de";
+  return "badge-ce";
+}
+function renderQ1(){
+  const c = document.getElementById("jobCardsContainer");
+  const maxSal = Math.max(...q1Jobs.map(j=>j.salary));
+  c.innerHTML = q1Jobs.map((j,i)=>{
+    const isOutlier = j.salary >= 336500;
+    const pct = Math.round((j.salary/maxSal)*100);
+    return `
+    <div class="job-card">
+      <div class="jc-top">
+        <span class="jc-id">#${i+1} · ${j.job_posted_date}</span>
+        <span class="jc-badge badge-da">${j.job_title_short}</span>
+      </div>
+      <div class="jc-title">${j.job_title}</div>
+      <div style="font-size:0.82rem;font-weight:700;color:var(--accent);margin-bottom:0.6rem;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;line-height:1">$${Number(j.salary).toLocaleString()}
+        ${isOutlier?'<span style="font-family:\'DM Sans\',sans-serif;font-size:0.6rem;font-weight:600;background:#fdf3f0;color:#c84b31;border:1px solid #f5c4b8;border-radius:4px;padding:0.1rem 0.4rem;margin-left:0.4rem;vertical-align:middle">OUTLIER</span>':''}
+      </div>
+      <div style="background:var(--border);border-radius:4px;height:4px;margin-bottom:0.75rem">
+        <div style="width:${pct}%;height:100%;border-radius:4px;background:var(--accent)"></div>
+      </div>
+      <div class="jc-row"><span>Company</span><strong>${j.company}</strong></div>
+      <div class="jc-row"><span>Location</span><strong>${j.job_location}</strong></div>
+      <div class="jc-row"><span>Schedule</span><strong>${j.job_schedule_type}</strong></div>
+      <div class="jc-tags">
+        <span class="jc-tag tag-remote">Remote</span>
+        <span class="jc-tag">${j.job_schedule_type}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── RENDER Q2 ── */
+const skillCats = {
+  sql:'core',python:'core',r:'core',tableau:'viz','power bi':'viz',aws:'cloud',azure:'cloud',
+  databricks:'cloud',snowflake:'cloud',gcp:'cloud',pandas:'core',numpy:'core',pyspark:'core',
+  jupyter:'core',excel:'core',hadoop:'core',tensorflow:'core',pytorch:'core'
+};
+function skillPillClass(s){
+  const c = skillCats[s];
+  return c?` ${c}`:'';
+}
+function renderQ2(){
+  const c = document.getElementById("companyBlocksContainer");
+  c.innerHTML = q2Companies.map(co=>`
+    <div class="company-row">
+      <div class="co-name">${co.name}</div>
+      <div class="co-skills">
+        ${co.skills.length ? co.skills.map(s=>`<span class="skill-pill${skillPillClass(s)}">${s}</span>`).join('') : '<span style="color:var(--muted);font-size:0.78rem;font-style:italic;">No skills specified</span>'}
+      </div>
+      <div class="co-salary">$${(co.salary/1000).toFixed(0)}K</div>
+    </div>`).join('');
+}
+
+/* ── RENDER Q3 ── */
+function renderQ3(){
+  const max = q3Skills[0].count;
+  const c = document.getElementById("demandChartContainer");
+  c.innerHTML = q3Skills.map(s=>{
+    const pct = Math.round((s.count/max)*100);
+    return `<div class="demand-row">
+      <div class="demand-label">${s.skill}</div>
+      <div class="demand-bar-wrap">
+        <div class="demand-bar ${s.cls}" style="width:${pct}%">${pct}%</div>
+      </div>
+      <div class="demand-count">${(s.count/1000).toFixed(1)}K</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── RENDER Q4 ── */
+function renderQ4(){
+  const max = q4Skills[0].salary;
+  const c = document.getElementById("salarySkillsContainer");
+  c.innerHTML = q4Skills.map((s,i)=>{
+    const pct = Math.round((s.salary/max)*100);
+    const tier = i<3?'tier-1':i<8?'tier-2':'tier-3';
+    const crown = i===0?'👑':i===1?'🥈':i===2?'🥉':'';
+    return `<div class="skill-card ${tier}">
+      ${crown?`<span class="tier-crown">${crown}</span>`:''}
+      <div class="skill-card-name">${s.name}</div>
+      <div class="skill-card-salary">$${(s.salary/1000).toFixed(0)}K</div>
+      <div class="skill-card-bar"><div class="skill-card-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ── RENDER Q5 SCATTER ── */
+function renderQ5(){
+  const canvas = document.getElementById("scatterCanvas");
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.parentElement.clientWidth;
+  const H = 380;
+  canvas.width = W*dpr;
+  canvas.height = H*dpr;
+  canvas.style.width = W+'px';
+  canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const pad = {top:30,right:30,bottom:50,left:70};
+  const pw = W - pad.left - pad.right;
+  const ph = H - pad.top - pad.bottom;
+
+  const demands = q5Skills.map(s=>s.demand);
+  const salaries = q5Skills.map(s=>s.salary);
+  const maxD = Math.max(...demands), minD = Math.min(...demands);
+  const maxS = Math.max(...salaries), minS = Math.min(...salaries);
+
+  function xPos(d){ return pad.left + ((d-minD)/(maxD-minD))*pw; }
+  function yPos(s){ return pad.top + ph - ((s-minS)/(maxS-minS))*ph; }
+
+  // Grid
+  ctx.strokeStyle = '#e2dfd6'; ctx.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const y = pad.top + (ph/4)*i;
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+pw,y); ctx.stroke();
+    const sal = maxS - (i/4)*(maxS-minS);
+    ctx.fillStyle = '#8a8578'; ctx.font = '10px DM Mono,monospace'; ctx.textAlign='right';
+    ctx.fillText('$'+Math.round(sal/1000)+'K', pad.left-8, y+4);
+  }
+
+  // Axes labels
+  ctx.fillStyle='#8a8578'; ctx.font='11px DM Sans,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Demand (job postings)', pad.left+pw/2, H-8);
+  ctx.save(); ctx.translate(14, pad.top+ph/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('Avg Annual Salary', 0, 0); ctx.restore();
+
+  // Quadrant shading
+  const midD = xPos((maxD+minD)/2), midS = yPos((maxS+minS)/2);
+  ctx.fillStyle='rgba(39,134,74,0.04)';
+  ctx.fillRect(midD, pad.top, pw-(midD-pad.left), midS-pad.top);
+
+  // Dots
+  q5Skills.forEach((s,i)=>{
+    const x = xPos(s.demand), y = yPos(s.salary);
+    const isOptimal = s.demand>40000 && s.salary>95000;
+    const isHighSal = s.salary>105000;
+    const color = isOptimal?'#27864a':isHighSal?'#c84b31':'#2a6496';
+    const r = Math.max(5, Math.sqrt(s.demand/maxD)*20);
+
+    ctx.beginPath(); ctx.arc(x,y,r,0,2*Math.PI);
+    ctx.fillStyle = color+'22'; ctx.fill();
+    ctx.strokeStyle = color; ctx.lineWidth=2; ctx.stroke();
+
+    ctx.fillStyle = '#1a1915'; ctx.font='bold 10px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(s.name.toUpperCase(), x, y-r-4);
+  });
+}
+
+/* ── RENDER Q5 TABLE ── */
+function renderQ5Table(){
+  const maxD = Math.max(...q5Skills.map(s=>s.demand));
+  const maxS = Math.max(...q5Skills.map(s=>s.salary));
+  const scored = q5Skills.map(s=>({
+    ...s,
+    score: Math.round((s.demand/maxD*50) + (s.salary/maxS*50))
+  })).sort((a,b)=>b.score-a.score);
+
+  const tbody = document.getElementById("optimalTableBody");
+  tbody.innerHTML = scored.map((s,i)=>`
+    <tr>
+      <td><span class="rank-num">${i+1}</span></td>
+      <td><strong>${s.name.toUpperCase()}</strong></td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.78rem">${Number(s.demand).toLocaleString()}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--accent)">$${Number(s.salary).toLocaleString()}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:0.6rem">
+          <div class="score-bar-wrap" style="flex:1">
+            <div class="score-bar-fill" style="width:${s.score}%"></div>
+          </div>
+          <span style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);min-width:28px">${s.score}</span>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+/* ── INTERSECTION OBSERVER ── */
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.12});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+/* ── QUERY TOGGLE ── */
+function toggleQuery(id, btn) {
+  const block = document.getElementById(id);
+  block.classList.toggle('open');
+  btn.classList.toggle('open');
+  btn.querySelector('.arrow').textContent = block.classList.contains('open') ? '▼' : '▶';
+}
+
+/* ── COPY QUERY ── */
+function copyQuery(id, btn) {
+  const pre = document.getElementById(id);
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent = 'copied ✓';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ── INIT ── */
+renderQ1(); renderQ2(); renderQ3(); renderQ4();
+window.addEventListener('load',()=>{ renderQ5(); renderQ5Table(); });
+window.addEventListener('resize',()=>{ renderQ5(); });
+</script>
+</body>
+</html>
